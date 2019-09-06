@@ -1,0 +1,92 @@
+.zvc-header {
+    background: rgba(147,206,222,1);
+    background: -moz-linear-gradient(left, rgba(147,206,222,1) 0%, rgba(117,189,209,1) 41%, rgba(73,165,191,1) 100%);
+    background: -webkit-gradient(left top, right top, color-stop(0%, rgba(147,206,222,1)), color-stop(41%, rgba(117,189,209,1)), color-stop(100%, rgba(73,165,191,1)));
+    background: -webkit-linear-gradient(left, rgba(147,206,222,1) 0%, rgba(117,189,209,1) 41%, rgba(73,165,191,1) 100%);
+    background: -o-linear-gradient(left, rgba(147,206,222,1) 0%, rgba(117,189,209,1) 41%, rgba(73,165,191,1) 100%);
+    background: -ms-linear-gradient(left, rgba(147,206,222,1) 0%, rgba(117,189,209,1) 41%, rgba(73,165,191,1) 100%);
+    background: linear-gradient(to right, rgba(147,206,222,1) 0%, rgba(117,189,209,1) 41%, rgba(73,165,191,1) 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#93cede', endColorstr='#49a5bf', GradientType=1 );
+
+    -webkit-box-shadow: 7px 7px 21px -12px rgba(0,0,0,0.75);
+    -moz-box-shadow: 7px 7px 21px -12px rgba(0,0,0,0.75);
+    box-shadow: 7px 7px 21px -12px rgba(0,0,0,0.75);
+}
+
+.sidebar {
+    margin: 0;
+    padding: 4px;
+    padding-top:10px;
+    width: 270px;
+    position: fixed;
+    height: 100%;
+    overflow: auto;
+
+    background: rgba(242,246,248,1);
+    background: -moz-linear-gradient(top, rgba(242,246,248,1) 0%, rgba(216,225,231,1) 25%, rgba(181,198,208,1) 70%, rgba(224,239,249,1) 100%);
+    background: -webkit-gradient(left top, left bottom, color-stop(0%, rgba(242,246,248,1)), color-stop(25%, rgba(216,225,231,1)), color-stop(70%, rgba(181,198,208,1)), color-stop(100%, rgba(224,239,249,1)));
+    background: -webkit-linear-gradient(top, rgba(242,246,248,1) 0%, rgba(216,225,231,1) 25%, rgba(181,198,208,1) 70%, rgba(224,239,249,1) 100%);
+    background: -o-linear-gradient(top, rgba(242,246,248,1) 0%, rgba(216,225,231,1) 25%, rgba(181,198,208,1) 70%, rgba(224,239,249,1) 100%);
+    background: -ms-linear-gradient(top, rgba(242,246,248,1) 0%, rgba(216,225,231,1) 25%, rgba(181,198,208,1) 70%, rgba(224,239,249,1) 100%);
+    background: linear-gradient(to bottom, rgba(242,246,248,1) 0%, rgba(216,225,231,1) 25%, rgba(181,198,208,1) 70%, rgba(224,239,249,1) 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f2f6f8', endColorstr='#e0eff9', GradientType=0 );
+
+    -webkit-box-shadow: 7px 7px 21px -12px rgba(0,0,0,0.75);
+    -moz-box-shadow: 7px 7px 21px -12px rgba(0,0,0,0.75);
+    box-shadow: 7px 7px 21px -12px rgba(0,0,0,0.75);
+}
+.sidebar.collapsed {
+    display: none;
+}
+.main-content {
+    padding-left: 270px;
+    padding-top:10px;
+}
+.main-content.collapsed {
+    padding-left: 20px;
+}
+
+@media screen and (max-width: 700px) {
+    .sidebar {
+        width: 100%;
+        height: auto;
+        position: relative;
+    }
+    .main-content {padding-left: 20px;}
+}
+
+.sidebar-options {
+    list-style: none;
+    padding-left: 10px;
+}
+.sidebar-options li i {
+    margin-right: 4px;
+    margin-top: 4px;
+}
+.sidebar-first-level-option {
+    cursor: pointer;
+}
+.sidebar-first-level-option:hover {
+    text-decoration: underline;
+}
+.sidebar-collapsible-option.closed .sidebar-suboptions {
+    display: none;
+}
+.sidebar-collapsible-option.closed i {
+    transform: rotate(-90deg);
+}
+.sidebar-selectable-option {
+    cursor: pointer;
+    font-size: 90%;
+}
+.sidebar-selectable-option.selected {
+    font-weight: bolder;
+}
+.sidebar-selectable-option:hover {
+    text-decoration: underline;    
+}
+
+.link-to-component:hover {
+    text-decoration: underline !important;
+    cursor: pointer;
+}

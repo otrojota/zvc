@@ -1,0 +1,49 @@
+<h4>ZVC - Architecture</h4>
+<hr />
+<div class="container-fluid text-justify">
+    <div class="row">
+        <div class="col">
+            <img src="/img/zvc-architecture.svg?x=3" class="mb-2" width="100%" />
+        </div>
+        <div class="col">
+            <p>
+                ZVC web applications are built uppon <b>components</b>. Root components (usually only one representing the "Application") are embedded inside index.html.
+                Subcomponents are embedded inside the <b>view</b> (HTML part, as HTML tags) of its container component. 
+            </p>
+            <p>
+                Component <b>Controllers</b> provide <b>methods</b> to be called from its container component, and trigger <b>events</b> that can be captured by its containers. A compound controller is a coordinator of child components, reacting to its events and calling its methods, and surelly calling services (the "Model Part" not included in this framework).
+            </p>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <p>
+                ZVC parses then HTML parts (view) of components as they are loaded to find subcomponents, according to some specific rules.
+                <ul>
+                    <li>If DOM element does NOT inclued an "id" attribute, it is ignored.</li>
+                    <li>If component is a <code>DIV</code> and has a <code>data-z-component='path'</code> attribute, ZVC loads and injects a Custom subcomponent.</li>
+                    <li>If component is a <code>DIV</code> and has a <code>data-z-load='path'</code> attribute, ZVC creates a <code>ZLoader</code> component with a initial loaded subcomponent that can be replaced calling its <code>load(pathToComponent)</code> method according to some logic.</li>
+                    <li>Some TAGS, as <code>INPUTS</code> or <code>BUTTON</code>, creates Internal ZVC Componentes with custom events, methods and properties</li>
+                    <li>Imported JavaScript files, with ZVC custom components for each CSS Framework or extended funcionalities can have its own rules for discovery, based on DOM element types and its attributes.</li>
+                    <li>If no rule is applicable to find a valid component (and DOM element has an "id" attribute) ZVC creates a <code>ZBasicController</code>, a lightweight object to wrapp some basic DOM funcionality.</li>
+                </ul> 
+            </p>
+            <p>
+                Embedded components can be Custom (referenced by data-z-component or data-z-load) or Internal (provided in ZVC base library or included scripts).
+            </p>
+            <ul>
+                <li>
+                    Custom Components are created as separate HTML and JavaScript files. They are used to design the view and logic of your specific application. If Custom components are designed as black boxes, they can be reused by another applications (copying html, js and used sub-components). 
+                    Main and OrdersList (not shown in figure) are examples of Custom Components
+                </li>
+                <li>
+                    Internal ZVC components are those provided with the framework as Common HTML Components (buttons, inputs, select, etc.) or in external JavaScript files taht can be included in your index.html (zvc-bootstrap-table.js, for example)
+                </li>
+            </ul>
+            <p>
+                Controllers of each subcomponent are injected in container controller as attributes using its HTML id as attribute name. 
+                Access to subcomponents is made using "this" in container controller, as in example: <code>this.labelCustomer.text = this.customerName.value</code> for internal components or <code>this.ordersList.refresh(this.customerName.value)</code> for custom components.
+            </p>
+        </div>
+    </div>
+</div>

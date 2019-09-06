@@ -1,0 +1,16 @@
+<h4>ZDynamicSelect</h4>
+<p>ZSelect components are created atomatically for "SELECT" HTML tags with an id and data-z-id-field and data-z-label-field attributes.</p>
+<p>
+    Dynamic Select maintain an array of objects (rows). Attributes in view are used to select the field to use as label and as value in select.
+</p>
+<p>
+    Use "setRows" method to fill rows in component. Optionally pass an initial value (id-field) as a pre-selected row.
+</p>
+<p>
+    Use "value" property to obtain "id" field for selected row (or null) or "selectedRow" property to get the full selected row. 
+    ZDynamicSelect extends ZSelect, so "value" property is available for getting and setting the id of selected row and getSelectedText() to get label from selected text.
+</p>
+
+<div id="demo" data-z-component="./DynamicSelectDemo1"></div>
+<hr />
+<div id="codeBrowser" data-z-component="./../../common/CodeBrowser"></div>

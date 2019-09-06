@@ -1,0 +1,26 @@
+<h4>ZVC - Anatomy of index.html</h4>
+<hr />
+<p>ZVC is "style agnostic", so you can use your favourite CSS framework to design your application.</p>
+<p>
+    The only required file to use the framework is<br />
+    <code>&lt;script src="zvc.js"&gt;&lt;/script&gt;</code>
+</p>
+<p>
+    Some components are provided for specific frameworks that offers graphics parts with its own styles. 
+    For example, a Bootstrap table with paginator and a section describing current page and rows range is provided as an external (optional) component that can be included in your project using: <br /> 
+    <code>&lt;script src="zvc-bootstrap-table.js"&gt;&lt;/script&gt;</code>
+</p>
+<p>
+    After the index.html page has finished loading its content, a small script is needed to create the root component (usually one) representing the Application.
+    Event <code>document.DOMContentLoaded</code> can be used to this purpose. Root component must be associated to a DOM element in index.html page.
+</p>
+<pre><code id="initScript" class="language-javascript">
+    &lt;script&gt;
+        document.addEventListener("DOMContentLoaded", _ => {                
+            ZVC.options.debug.events = false;
+            ZVC.fromElement("main");
+        });
+    &lt;/script&gt;
+</code></pre>
+<p>This is a full example of a typical Bootstrap index.html page using only common components included in ZVC.</p>
+<pre><code id="samplePage" class="language-html" style="font-size: 80%;"></code></pre>
