@@ -1,0 +1,112 @@
+<h4>ZVC - API Specification</h4>
+<hr />
+<p>
+    <code>ZVC</code> object provides static methods to initialize root component and settng some properties. 
+    <code>ZController</code> class is the base class for every Component in the framework.
+</p>
+<p>
+    Many methods are declared as <code>async</code> returning Promises, so they can be called using <code>await</code> or in the "Promise way", using <code>.then().catch()</code>
+</p>
+<hr />
+<h4><code>ZVC</code></h4>
+<ul>
+    <li>
+        <code>ZVC.options.debug.event:boolean</code>
+        <p>Logs to console events triggering and processing.</p>
+    </li>
+    <li>
+        <code>async ZVC.fromElement(domElement, options)</code>
+        <p>
+            Entry point to create root controller from a DOM Element. Usually DOM element is a DIV containit data-z-component="./SomeComponent".
+            options are passed to created controller as the argument in <code>init</code> event, and can be accesed using: <br/>
+            <code>onThis_init(options) {this.options = options}</code>
+        </p>
+    </li>
+</ul>
+<hr />
+<h4><code>ZController</code></h4>
+<p>
+    ZController abstract class adds common behaviour for all components in ZVC. It adds basic wrappers (methods and properties) to common operations on dom elements.
+    ZControllers should not be contructed calling its constructor. They are created by the framework (ZVC Object) while components are loaded, parsing its view (HTML).
+</p>
+<ul>
+    <li>
+        <code>view:domElement</code>
+        <p>Read only property usefull to acces references dom Element associated with the controller</p>
+    </li>
+    <li>
+        <code>id:string</code>
+        <p>Read only property with de id of the domElement. Its is a simple wrapper for <code>get id() {return this.view.id}</code></p>
+    </li>
+    <li>
+        <code>async triggerEvent(eventName, ...args) </code>
+        <p>
+            Inform an event has ocurred to the container components. Black box design implies a coponent should not know its containers, so the way to comunicate to its container should be triggering events with arguments.
+            For example, a "customerList" component should trigger an event indicanting to its container that selected customer in list has change. This could be done like this:
+            <br /><code>onCustomers_change() {<br />
+            &nbsp;&nbsp;this.triggerEvent("customerChanged", this.customers.value);<br />
+            }</code><br />
+        </p>
+        <p>
+            Events can be used to ask to container for a value needed to complete an operation, even in a asynchronous way. Consider the following scenario. To complete an operation, a component needs the e-mail address of a contact and it should be provided by its container component (this design allows the same component to be embedded inside diferent containers, each one providing corresponding e-mail addresses).<br />
+            Component can ask for the e-mail to it's container triggering an event:<br />
+            <code>let email = await this.triggerEvent("requestEmail", this.contactId)</code><br/>
+            Container component should respond to the request:<br />
+            <code>onChildComponent_requestEmail(contactId) {return await this.requestContact(contactId).email}</code>
+        </p>
+    </li>
+    <li>
+        <code>find(query) / findAll(query)</code>
+        <p>
+            Wrappers for querySelector and querySelectorAll called from this.view. If a component should access a dom element inside it's view, it should use these wrappers, so coorect dom elements will be found, even if same "id" is used elsewere in the page (for example, same component is loaded multiple times in the page)            
+        </p>
+        <code>find(query) {return this.view.querySelector(query)}</code><br />
+        <code>findAll(query) {return this.view.querySelectorAll(query)}</code>
+    </li>
+    <li>
+        <code>show() / hide()</code>
+        <p>
+            Wrappers for style.display in view. Hidding a component saves it current "style.display" property before setting it to "none", so it can be restores properly when calling "show".
+        </p>
+    </li>
+    <li>
+        <code>hasClass(className) / addClass(classesNames) / removeClass(classesNames) / toggleClass(className)</code>
+        <p>
+            Wrappers to classList object in view. addClass and removeClass can receive multiple classes, separated by space.
+        </p>
+    </li>
+    <li>
+        <code>getAttribute(name) / setAttribute(name, value)</code>
+        <p>
+            Wrappers to view attributes setter and getter. It allows access to dom element attributes, as data-, for example.
+        </p>
+    </li>
+    <li>
+        <code>text property</code>
+        <p>
+            Wrappers to view textContent property as getter and setter.
+        </p>
+    </li>
+    <li>
+        <code>html property</code>
+        <p>
+            Wrappers to view innerHTML property as getter and setter.
+        </p>
+    </li>
+    <li>
+        <code>enable() / disable() / isEnabled()</code>
+        <p>
+            Wrappers to view.disabled property.
+        </p>
+    </li>
+    <li>
+        <code>showDialog(pathToComponent, okCallback(returnData), cancelCallback())</code>
+        <p>
+            Abstract method to open a Modal Dialog. Dialogs are implemented in CSS Framework dependant waty, but the API to open and receive data from them is the same.
+            Unlike Custom Controllers (who extends ZCustomController) Dialog controllers should extends ZDialog wich adds a <code>close(returnData)</code> and <code>cancel()</code> method to close them.
+        </p>
+        <p>
+            Please visit the specific documentation in ZVC for each CSS framework for examples of using Dialogs.
+        </p>
+    </li>
+</ul>

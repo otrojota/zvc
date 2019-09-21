@@ -13,6 +13,11 @@ class ZVC {
         if (!ZVC._options) ZVC._options = ZVC._defaultOptions;
         return ZVC._options;
     }
+    static nextZId() {
+        if (ZVC._nextZId === undefined) ZVC._nextZId = 1;
+        else ZVC._nextZId++;
+        return ZVC._nextZId;
+    }
     static async fromElement(domElement, options) {
         domElement = typeof domElement == "string"?document.getElementById(domElement):domElement;
         let path = domElement.getAttribute("data-z-component");
@@ -82,14 +87,41 @@ class ZVC {
             }
             let controllerClass = ZVC.lastExportedClass;
             if (!controllerClass) throw "No ZVC.export(ControllerClass) at the end of controller file";
-            domElement.innerHTML = html;
+            let zId = ZVC.nextZId();
+            domElement.innerHTML = ZVC.parseHTML(html, {zId:zId});
             let controller = new (controllerClass)(domElement, parentController, dir)
+            controller.zId = zId;
             return controller;
         } catch(error) {
             console.trace(error);
             throw error;
         }
-    }    
+    }
+    static parseHTML(html, vars) {
+        let st = "";
+        let i0 = 0;
+        let i1 = html.indexOf("${", i0);        
+        while (i1 >= 0) {
+            let p = html.indexOf("}", i1);
+            if (p >= 0) {
+                st += html.substring(i0, i1);
+                let varName = html.substring(i1+2, p);
+                let value = vars[varName];
+                if (value !== undefined) {
+                    st += value;
+                } else {
+                    st += "${" + varName + "}";
+                }
+                i0 = p + 1;
+                i1 = html.indexOf("${", i0); 
+            } else {
+                i1 = -1;
+            }
+        }
+        return st + html.substring(i0);
+    }
+    static async openDialogInPlatform() {throw "openDialogInPlatform not implemented for ZDialogs"}
+    static async closeDialogInPlatform() {throw "closeDialogInPlatform not implemented for ZDialogs"}
 }
 
 /** Base Classes */
@@ -101,7 +133,7 @@ class ZController {
         this.path = basePath;
     }
     get view() {return this.domElement}
-    get id() {return this.domElement.id}
+    get id() {return this.view.id}
     
     zDescribe() {return this.constructor.name + "[" + this.id + "]"}
 
@@ -110,7 +142,7 @@ class ZController {
     }
     async triggerEvent(eventName, ...args) {
         if (!this.parentController) return;
-        if (ZVC.options.debug.events) console.log("[" + this.zDescribe() + "] is triggering event " + eventName + " with args", args);
+        if (ZVC.options.debug.events) console.debug("[" + this.zDescribe() + "] is triggering event " + eventName + " with args", args);
         return await this.parentController.processEvent(this, eventName, args);
     }
     async processEvent(control, eventName, args) {
@@ -118,10 +150,10 @@ class ZController {
         let funcName = "on" + srcId.substr(0,1).toUpperCase() + srcId.substr(1) + "_" + eventName;
         let func = this[funcName];
         if (func && typeof func == "function") {
-            if (ZVC.options.debug.events) console.log("[" + this.zDescribe() + "] is processing event " + eventName + " from " + control.zDescribe() + " with args", args);
+            if (ZVC.options.debug.events) console.debug("[" + this.zDescribe() + "] is processing event " + eventName + " from " + control.zDescribe() + " with args", args);
             return await func.apply(this, args);
         } else {
-            if (ZVC.options.debug.events) console.log("[" + this.zDescribe() + "] is skipping event " + eventName + " from " + control.zDescribe() + " with args", args);
+            if (ZVC.options.debug.events) console.debug("[" + this.zDescribe() + "] is skipping event " + eventName + " from " + control.zDescribe() + " with args", args);
         }
     }
     async activate() {
@@ -137,12 +169,15 @@ class ZController {
         return this.view.querySelectorAll(query);
     }
     hide() {
-        this.savedDisplay = this.view.style.display;
-        this.style.display = "none";
+        if (this.view.style.display != "none") this.savedDisplay = this.view.style.display;
+        this.view.style.display = "none";
     }
     show(display) {
         let newDisplay = (display?display:this.savedDisplay) || "block";
-        this.style.display = newDisplay;
+        this.view.style.display = newDisplay;
+    }
+    isVisible() {
+        return this.view.style.display != "none";
     }
     hasClass(className) {
         return this.view.classList.includes(className);
@@ -165,6 +200,22 @@ class ZController {
     enable() {this.view.disabled = false}   
     disable() {this.view.disabled = true}
     isEnabled() {return this.view.disableb?false:true}
+
+    async showDialog(path, options, okCallback, cancelCallback) {
+        let cnt = document.getElementById("dialogs-container");
+        if (!cnt) {
+            cnt = document.createElement("DIV");
+            cnt.setAttribute("id", "dialogs-container");
+            document.body.appendChild(cnt);
+        }
+        let div = document.createElement("DIV");
+        cnt.appendChild(div);
+        let controller = await ZVC.loadComponent(div, this, path);
+        if (!controller instanceof ZDialog) throw "Controller is not a ZDialog instance";
+        await controller.init(options);
+        await controller.open(okCallback, cancelCallback);
+        return controller;
+    }
 }
 
 class ZBasicController extends ZController {
@@ -183,9 +234,9 @@ class ZCompoundController extends ZController {
         this.controllers = [];
     }
 
-    async init() {        
+    async init(options) {        
         await this.parseFrom(this.domElement);
-        await super.init();
+        await super.init(options);
     }
     async activate() {
         for (let i=0; i<this.controllers.length; i++) {
@@ -233,6 +284,29 @@ class ZCompoundController extends ZController {
     }
 }
 
+class ZDialog extends ZCompoundController {
+    async open(okCallback, cancelCallback) {
+        this.okCallback = okCallback;
+        this.cancelCallback = cancelCallback;
+        ZVC.openDialogInPlatform(this);
+        await this.activate();
+    }
+    async close(returnData) {
+        if (this.okCallback) await this.okCallback(returnData);
+        await this.deactivate();
+        this._closedFromController = true;
+        ZVC.closeDialogInPlatform(this);
+        this.view.parentNode.removeChild(this.view);
+    }
+    async cancel() {
+        if (this.cancelCallback) await this.cancelCallback();
+        await this.deactivate();
+        this._closedFromController = true;
+        ZVC.closeDialogInPlatform(this);
+        this.view.parentNode.removeChild(this.view);
+    }
+}
+
 class ZCustomController extends ZCompoundController {
 
 }
@@ -256,14 +330,20 @@ class ZInput extends ZController {
     set checked(c) {this.view.checked = c}
 
     onThis_init() {
-        let delay = this.getAttribute("data-z-autochange-delay");
-        if (!delay || isNaN(delay) || delay <= 0) delay = false;
-        this.delay = (!delay || isNaN(delay) || delay <= 0)?false:delay;
-        this.oldValue = this.value;
-        this.view.onchange = e => this.triggerDelayedChange(e);
-        if (this.delay) {
-            this.view.onclick = e => this.triggerDelayedChange(e);
-            this.view.onkeyup = e => this.triggerDelayedChange(e);
+        this.view.onclick = e => this.triggerEvent("click", e);
+        this.type = this.getAttribute("type");
+        if (this.type == "checkbox" || this.type == "radio") {
+            this.view.onchange = e => this.triggerEvent("change", e);
+        } else {
+            let delay = this.getAttribute("data-z-autochange-delay");
+            if (!delay || isNaN(delay) || delay <= 0) delay = false;
+            this.delay = (!delay || isNaN(delay) || delay <= 0)?false:delay;
+            this.oldValue = this.value;
+            this.view.onchange = e => this.triggerDelayedChange(e);
+            if (this.delay) {
+                this.view.onclick = e => this.triggerDelayedChange(e);
+                this.view.onkeyup = e => this.triggerDelayedChange(e);
+            }
         }
     }
     triggerDelayedChange(e) {

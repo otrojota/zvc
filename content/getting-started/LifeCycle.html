@@ -1,0 +1,24 @@
+<h4>
+    ZVC - Components Life Cycle
+    <img src="/img/zvc.svg" height="30px" style="float: right;"/>
+</h4>
+<hr />
+<p>
+    Base components, library components (included scripts) and Custom Components (user created) follows same life cycle.
+    Events corresponding to life cycle are triggered to components from themselves, so they can be captured using <code>onThis_eventName()</code>.    
+</p>
+<p>
+    Life Cycle Events
+    <ul>
+        <li>
+            <code>init</code><br />
+            Init event is triggered after creation of component is complete and after init event was triggered inside every child component (and it's own subcomponentes, recursively). 
+            This event can be used to register DOM listeners or to initialize default values for properties and component fields or custom subcomponents initialization.
+        </li>
+        <li>
+            <code>activated</code> and <code>deactivated</code><br />
+            Activated event is triggered after initialization and when component is ready to interact with the user. 
+            Deactivated evet is triggered just before component becomes invisible. This can be temporary or before it will be destroyed. For example, a ZLoader calls deactivate on current (loaded) component before loading the new one (calling init and activated in the new one).
+        </li>
+    </ul>
+</p>

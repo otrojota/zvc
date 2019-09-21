@@ -1,0 +1,73 @@
+<h4>
+    ZVC - Using Custom Components
+    <img src="/img/zvc.svg" height="30px" style="float: right;"/>
+</h4>
+<hr />
+<p>
+    Custom components are those you design as the blocks that builds up your web application.
+    Custom components can be reused in many applications, just by copying de view (html, css) and de controller (js), and any used subcomponents.
+</p>
+<p>
+    You can structure folders in your application as you want, for example, following the structure of main options of your site. It is preferable to use relative paths to reference a component from another (a container inicluding a component). 
+    By using relative paths (starting with "./") components can be moved to another folder or copied to another application maintainning consistance.
+</p>
+<p>
+    To create a new Custom Component choose a valid name (a class name, starting with upper case) and a folder. Create two files with the chosen name and extensions ".html" and ".js". If its necessary, add required CSS styles to your project styles or create and import a new CSS file.
+</p>
+<p>
+    HTML file contains the View part of your component and should follow the rules and structure of the CSS framework you are using (for example, rows and columns for Bootstrap). 
+    HTML elements will be created under a common DOM node (depending on the way the component is loaded). Container node will be accesible in controller as "this.view".
+</p>
+<p>
+    JS file contains the declaration of the JavaScript Class that implements de Controller part of your component. It should extend ZCustomController if it is a normal HTML block (panel) ot ZDialog if it will be opened as a Modal Dialog.
+    Custom Controller class must be exported at the end of the JS file using <code>ZVC.export(MyControllerClass)</code>
+</p>
+<p>
+    Every element inside HTML with a valid "id" attribute will be created as a field inside the controller, pointing to a controller of a subcomponent created for that dom element (a class extending ZController). 
+    Depending of the type of DOM element and included external libraries, created controller can be of different types, bu always extending the base ZController.
+</p>
+<h5>Loading Custom Components</h5>
+<p>
+    Custom Components can be <strong>statically</strong> or <strong>dynamically</strong> loaded.     
+</p>
+<p>
+    Following examples use a simple "LoadingDemoPage" component that defines a Title and a "counter" and some methods to change its properties. Additionally LoadingDemoPage component has a button to show how to trigger and capture events from child components in containers, depending on the way they are loaded.
+</p>
+<hr />
+<div id="demoPage" data-z-component="./LoadingDemoPage"></div>
+<hr />
+<div id="codeBrowser" data-z-component="./../../common/CodeBrowser"></div>
+<hr />
+<h5>Statically Loaded Custom Components</h5>
+<p>
+    <strong>Statically</strong> loaded components are embedded inside a container just by creating a <code>data-z-component="path"</code> attribute inside a DIV element in container's view.
+</p>
+<p>
+    Statically loaded components cannot pass options to "init" event of child components. Initialization could be made in "init" event in container or using custom "data" attributes in html. 
+</p>
+<p>
+    A field is created inside container component using DIV element's id as the name, and pointing to the controller of the created child component. All available properties and methods you create in the child component are accesible via these created field.
+</p>
+<hr />
+<div id="demoStatic" data-z-component="./LoadingStaticDemo"></div>
+<hr />
+<div id="codeBrowser2" data-z-component="./../../common/CodeBrowser"></div>
+<hr />
+<h5>Dynamically Loaded Custom Components</h5>
+<p>
+    <strong>Dynamically</strong> loaded components can change according to the logic in container's controller. Must be created as a DIV element with an initial loaded component using <code>data-z-load="path"</code> attribute.
+</p>
+<p>
+    After creation, loaded component inside container can be changed using <code>this.loaderComponent.load(path)</code>
+</p>
+<p>
+    A reference to the current loaded component in ZLoader (the DIV with data-z-load attribute) is available in <code>this.loaderElement.content</code>.
+    Events triggered by loaded component are passed from ZLoader directly to its container component. 
+</p>
+<p>
+    Container controller must be aware that, depending on the current loaded component, some properties and methods could not be available. Following example shows this case, just by reporting the error (production code should check the existance of properties and functions before accesing them)
+</p>
+<hr />
+<div id="demoDynamic" data-z-component="./LoadingDynamicDemo"></div>
+<hr />
+<div id="codeBrowser3" data-z-component="./../../common/CodeBrowser"></div>

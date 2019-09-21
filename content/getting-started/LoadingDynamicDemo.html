@@ -1,0 +1,16 @@
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-sm-4">
+            <select id="pageSelector" class="custom-select mt-1" size="3">
+                <option value="empty" selected>Empty Panel</option>
+                <option value="1">Demo Page 1</option>
+                <option value="2">Demo Page 2</option>
+            </select>
+            <button id="increment" class="btn btn-primary w-100 mt-1">Increment</button>
+        </div>
+        <div class="col-sm-8 border">
+            <div id="pageLoader" data-z-load="common/Empty"></div>
+        </div>
+    </div>
+</div>
+<div id="output" class="alert alert-info mt-2"></div>
