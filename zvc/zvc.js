@@ -23,7 +23,10 @@ class ZVC {
         let path = domElement.getAttribute("data-z-component");
         if (!path) throw "Root element must have data-z-component='path-to-component'";
         if (path.startsWith("./")) {
-            path = document.location.pathname + path.substr(1);
+            let docPath = document.location.pathname;
+            let p = docPath.lastIndexOf("/");
+            if (p > 0) docPath = docPath.substr(0,p);
+            path = docPath + path.substr(1);
         }
         let newComponent = await ZVC.loadComponent(domElement, null, path);
         await newComponent.init(options);
