@@ -16,8 +16,6 @@ class Demo7 extends ZCustomController {
             row._rowClass = "table-danger";
             row.iconActive = "<i class='far fa-square'></i>";
         }
-        row.iconEdit = "<i class='fas fa-edit text-secondary'></i>";
-        row.iconDelete = "<i class='fas fa-trash-alt text-danger'></i>";
         return row;
     }
     onCustomersList_cellClick(row, rowIndex, field) {
