@@ -1,14 +1,14 @@
 # ZVC - 0.83
 
 <p><i>
-Work in progress. Collaborators needed, please see <a href="https://otrojota.github.io/zvc/">Documentation Page</a>, read the principles and contact us if you want to collaborate.
+Work in progress. Collaborators needed, please see <a href="https://otrojota.github.io/zvc/" target="_blank">Documentation Page</a>, read the principles and contact us if you want to collaborate.
 </i></p><br /><hr />
 
 
 ZVC is a View-Controller Framework for web applications. It is focused on simplicity, component's reusability, lightweight, fast page loading and a fast development workflow.
 
-Please visit <a href="https://otrojota.github.io/zvc/">Documentation Page</a> for documentation an live preview of current components. If you prefer a CSS demo of more complex components, visit:<br />
-<a href="https://otrojota.github.io/zvc/bs.html">Boostrap Components Documentation</a>
+Please visit <a href="https://otrojota.github.io/zvc/" target="_blank">Documentation Page</a> for documentation an live preview of current components. If you prefer a CSS demo of more complex components, visit:<br />
+<a href="https://otrojota.github.io/zvc/bs.html" target="_blank">Boostrap Components Documentation</a>
 
 Current web frameworks for front-end devolopment have evolved to the point they need a lot of tools for developing a simple one page application. ZVC aims to provide a robust base for designing complex and large web applications using only your preferred IDE, in very fast development cicles.
 
