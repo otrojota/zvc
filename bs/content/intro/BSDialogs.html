@@ -1,0 +1,24 @@
+<h4>ZDialog</h4>
+<p>
+    ZVC presents Modal Dialogs independent of the CSS framework used. Some specific code needs to be included in your <code>index.html</code> to get things working.
+</p>
+<p>
+    If your Boostrap application uses Modal Dialogs, after zvc.js import, include in your index.html<br />
+    <code>&lt;script src="zvc/zvc-bootstrap-dialogs.js"&gt;&lt;/script&gt;</code>
+</p>
+<p>
+    Each Dialog should be designed as a Component, with its View (HTML) and Controller (JS). HTML can reference another ZVC components in the usual way (Statically o Dynamically).
+    Controller shouls extend ZDialog instead ZCustomController.
+</p>
+<p>
+    Dialogs should be closed from Dialog Controller using <code>this.close(returnData)</code> or <code>this.cancel()</code>
+</p>
+<p>
+    Use <code>this.showDialog(path, options, okCallback(returnData), cancelCallback())</code> to open a Dialog.
+    Options will be passed to <code>onThis_init(options)</code> in Dialog controller.
+</p>
+
+<div id="demo" data-z-component="./BSDialogsDemo1"></div>
+<hr />
+<div id="codeBrowser" data-z-component="./../../../common/CodeBrowser"></div>
+<div id="codeBrowser2" data-z-component="./../../../common/CodeBrowser"></div>

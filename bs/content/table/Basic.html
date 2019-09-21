@@ -1,0 +1,23 @@
+<h4>ZVC Bootstrap Table - Basic Usage</h4>
+<p>
+    Configuration is done in HTML using data-z attributes on table and columns (and pagination if it uses).
+    Data is passed to table as an array of rows. Each row is an object with fields with names declared in data-z-field attribute for TH elements in THEADER.
+</p>
+<p>
+    Table can work with and without pagination. Pagination can be local or server side (request ecah page to server). 
+    ZVC explicitly does not include Models (sevices, in this case) so data is requested to container elements using events, wich can asynchronously make requests to server to retrieve data.
+</p>
+<p>
+    Container controller must call <code>refresh</code> method on table controller and table will request rows as needed via <code>getRows</code> event or a combination of <code>getRowsCount</code> and <code>getRowsPage</code><br />
+    Remember that handlers for this events (like every handler in ZVC) could be declared <code>async</code> or return a <code>Promise</code> to make easy working with server side requests.
+</p>
+<p>
+    In this basic example, no pagination is used, so event handler returns all rows (filtered by text) using services in sample CustomersModel presented in Introduction.
+</p>
+<p>
+    Example includes a navbar with a TextSearch component to filter customers. Enter a number to see how it works.
+</p>
+<hr />
+<div id="demo1" data-z-component="./Demo1"></div>
+<hr />
+<div id="codeBrowser" data-z-component="./../../../common/CodeBrowser"></div>

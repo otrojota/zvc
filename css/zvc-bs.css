@@ -1,0 +1,75 @@
+.zvc-header {
+    -webkit-box-shadow: 7px 7px 21px -12px rgba(0,0,0,0.75);
+    -moz-box-shadow: 7px 7px 21px -12px rgba(0,0,0,0.75);
+    box-shadow: 7px 7px 21px -12px rgba(0,0,0,0.75);
+    background-color: #563d7c;
+}
+
+.sidebar {
+    margin: 0;
+    padding: 4px;
+    padding-top:10px;
+    width: 270px;
+    position: fixed;
+    height: 100%;
+    overflow: auto;
+
+    -webkit-box-shadow: 7px 7px 21px -12px rgba(0,0,0,0.75);
+    -moz-box-shadow: 7px 7px 21px -12px rgba(0,0,0,0.75);
+    box-shadow: 7px 7px 21px -12px rgba(0,0,0,0.75);
+}
+.sidebar.collapsed {
+    display: none;
+}
+.main-content {
+    padding-left: 270px;
+    padding-top:10px;
+}
+.main-content.collapsed {
+    padding-left: 20px;
+}
+
+@media screen and (max-width: 700px) {
+    .sidebar {
+        width: 100%;
+        height: auto;
+        position: relative;
+    }
+    .main-content {padding-left: 20px;}
+}
+
+.sidebar-options {
+    list-style: none;
+    padding-left: 10px;
+}
+.sidebar-options li i {
+    margin-right: 4px;
+    margin-top: 4px;
+}
+.sidebar-first-level-option {
+    cursor: pointer;
+}
+.sidebar-first-level-option:hover {
+    text-decoration: underline;
+}
+.sidebar-collapsible-option.closed .sidebar-suboptions {
+    display: none;
+}
+.sidebar-collapsible-option.closed i {
+    transform: rotate(-90deg);
+}
+.sidebar-selectable-option {
+    cursor: pointer;
+    font-size: 90%;
+}
+.sidebar-selectable-option.selected {
+    font-weight: bolder;
+}
+.sidebar-selectable-option:hover {
+    text-decoration: underline;    
+}
+
+.link-to-component:hover {
+    text-decoration: underline !important;
+    cursor: pointer;
+}

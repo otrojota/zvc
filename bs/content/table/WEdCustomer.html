@@ -1,0 +1,43 @@
+<div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalCenterTitle">Edit Customer</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body bg-light">
+                <div id="errorMsg" class="alert alert-warning my-2"></div>
+                <form class="container">
+                    <div class="form-row">
+                        <div class="col">
+                            <div class="form-group">
+                                <label for="edId">Customer Id</label>
+                                <input id="edId" type="text" class="form-control">
+                            </div>        
+                        </div>
+                        <div class="col text-right">
+                            <div class="form-group form-check pt-4">
+                                <input id="edActive" type="checkbox" class="form-check-input">
+                                <label class="form-check-label" for="edActive">Customer is Active</label>
+                            </div>      
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="col">
+                            <div class="form-group">
+                                <label for="edName">Customer Name</label>
+                                <input id="edName" type="text" class="form-control">
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button id="cmdOk" type="button" class="btn btn-primary">Ok</button>
+                <button id="cmdCancel" type="button" class="btn btn-secondary">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>

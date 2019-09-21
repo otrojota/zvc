@@ -34,7 +34,9 @@ class ZBootstrapTable extends ZController {
         this.findAll("th").forEach(th => {
             this.columns.push({
                 field:th.getAttribute("data-z-field"), 
-                detailsToggler:th.getAttribute("data-z-details-toggler")?true:false
+                detailsToggler:th.getAttribute("data-z-details-toggler")?true:false,
+                cellClass:th.getAttribute("data-z-cell-class"),
+                clickable:th.getAttribute("data-z-clickable") == "true"?true:false
             });
         });
         this.hasDetailsToggler = this.columns.findIndex(c => c.detailsToggler) >= 0;
@@ -91,7 +93,6 @@ class ZBootstrapTable extends ZController {
             this.repaint();
         } else {
             this.totalRows = await this.triggerEvent("getRowsCount");
-            console.log("totalRows", this.totalRows);
             if (this.totalRows === undefined || isNaN(this.totalRows)) {
                 this.totalRows = 0;
                 throw "No number returned to list in getRowsCount event";
@@ -134,14 +135,14 @@ class ZBootstrapTable extends ZController {
         this.registerEventListeners();
         if (this.rowsInfo) {
             if (!this.totalRows) {
-                this.rowsInfo.textContent = "No se encontraron resultados";    
+                this.rowsInfo.textContent = "No rows found";    
             } else {
-                if (this.totalRows == 1) this.rowsInfo.textContent = "Se encontró una fila"
+                if (this.totalRows == 1) this.rowsInfo.textContent = "One row found"
                 else {
                     if (this.pagination != "none") {
-                        this.rowsInfo.textContent = "Mostrando filas " + (startRow + 1) + " a " + endRow + " de " + this.totalRows;
+                        this.rowsInfo.textContent = "Rows " + (startRow + 1) + " to " + endRow + " from " + this.totalRows;
                     } else {
-                        this.rowsInfo.textContent = "Se encontraron " + this.totalRows + " filas";
+                        this.rowsInfo.textContent = "" + this.totalRows + " rows found";
                     }
                 }
             }
@@ -185,7 +186,7 @@ class ZBootstrapTable extends ZController {
             if (col.detailsToggler) {
                 let cellClass = this.detailsTogglerCellClass;
                 if (row.detailsToggler_cellClass) cellClass += " " + row.detailsToggler_cellClass;
-                html += "<td class='details-toggler " + cellClass + "'>";
+                html += "<td class='details-toggler " + cellClass + "' style='cursor:pointer;'>";
                 if (this.detailsPanels[rowIndex]) {
                     html += "  <i class='" + this.detailsTogglerCloseIcon + "'></i>";
                 } else {
@@ -194,9 +195,12 @@ class ZBootstrapTable extends ZController {
                 html += "</td>";
             } else {
                 let cellClass = this.cellClass;
+                if (col.cellClass) cellClass += " " + col.cellClass;
                 if (row[col.field + "_cellClass"]) cellClass += " " + row[col.field + "_cellClass"];
                 html += "<td class='" + cellClass + "'>";
+                if (col.clickable) html += "<a href='#' class='clickable-cell' data-row='" + rowIndex + "' data-field='" + col.field + "'>";
                 html += row[col.field];
+                if (col.clickable) html += "</a>";
                 html += "</td>";
             }
         }
@@ -239,6 +243,14 @@ class ZBootstrapTable extends ZController {
                 }
             })
         }
+        this.findAll(".clickable-cell").forEach(cell => {
+            cell.onclick = e => {
+                let idx = parseInt(cell.getAttribute("data-row"));
+                let field = cell.getAttribute("data-field");
+                this.triggerEvent("cellClick", this.rows[idx], idx, field);
+                e.preventDefault();
+            }
+        })
         if (this.hasDetailsToggler) {
             this.findAll(".details-toggler").forEach(td => {
                 let tr = td.parentNode;

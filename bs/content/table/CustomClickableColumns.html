@@ -1,0 +1,22 @@
+<h4>ZVC Bootstrap Table - Custom Clickable Columns</h4>
+<p>
+    Cells are rendered with the value of each row. If corresponding field contains HTML instead of plain text, it will be rendered as HTML.
+</p>
+<p>
+    If attribute <code>data-z-clickable</code> is added to required TH elements, table will trigger a <code>cellClick(row, rowIndex, field)</code> event. <br />
+    Cell click events, inconjuntion with custom HTML cells, can be used to change some data in the table.
+</p>
+<p>
+    Following example uses this combination to change the status of each customer (active / inactive) just by clicking an icon in the last column.<br />
+    A common pattern is to use a <code>prepareRow</code> method to add custom HTML to a row returned by a service.
+</p>
+<p>
+    If the row passed to a table contains a field called <code>_rowClass</code> the entire row (TR element) will have that style. It can be used to show a record state. In this example, inactive customers will show with a different style.
+</p>
+<p>
+    Finally, if you want to update a row in a table without refreshing all rows (no need to call server again) you can use <code>updateRow(rowIndex, row)</code>
+</p>
+<hr />
+<div id="demo3" data-z-component="./Demo3"></div>
+<hr />
+<div id="codeBrowser" data-z-component="./../../../common/CodeBrowser"></div>

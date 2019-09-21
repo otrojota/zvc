@@ -1,0 +1,27 @@
+<h4>ZVC Bootstrap Table - Inline Record Edition</h4>
+<p>
+    ZVC Bootstrap Table has the ability to open a "details" area for each displayed row, and even for a new row to be added.
+    This area can be filled with any Custom component in ZVC.
+</p>
+<p>
+    Row detail area can be used to show row properties, offer custom actions based on row data or, as in this example, to edit the row data.
+</p>
+<p>
+    One of the columns defined in THEADER can act as an "opener" for row's details area. 
+    When user selects the icon in that column, table asks to container (using an event) for the path to the component to open and de initial options to pass to that component after creation (on its init event).
+</p>
+<p>
+    This demo uses a Custom Component called PEdCustomer (Panel for Customer Edition) equivalent (and ver similar) to WEdComponent used in Dialog Based Edition.
+    This panel has three buttons: Save, Cancel and Delete. Delete Button is hidden when panel is open to edit a new record. Same way, Customer Id field is disabled when editing an existing record.
+</p>
+<p>
+    Events triggered from Details Component are passed directly to table container controller, adding to extra parameters at the begining of the handler function: row and rowIndex. 
+</p>
+<hr />
+<div id="demo7" data-z-component="./Demo7"></div>
+<hr />
+<h5>Table Component</h5>
+<div id="codeBrowser" data-z-component="./../../../common/CodeBrowser"></div>
+<hr />
+<h5>Editor Panel Component</h5>
+<div id="codeBrowser2" data-z-component="./../../../common/CodeBrowser"></div>
