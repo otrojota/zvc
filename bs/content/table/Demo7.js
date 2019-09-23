@@ -33,18 +33,20 @@ class Demo7 extends ZCustomController {
             }
         }
     }
-    onCustomersList_cancel(row, rowIndex) {
-        this.customersList.closeDetails(rowIndex);
+    async onCustomersList_cancel(row, rowIndex) {
+        await this.customersList.closeDetails(rowIndex);
     }
-    onCustomersList_saved(row, rowIndex) {        
+    async onCustomersList_saved(row, rowIndex) {
+        await this.customersList.closeDetails(rowIndex);
         this.customersList.refresh();
     }
-    onCustomersList_deleted(row, rowIndex) {        
+    async onCustomersList_deleted(row, rowIndex) {
+        await this.customersList.closeDetails(rowIndex);      
         this.customersList.refresh();
     }
 
-    onNewCustomer_click() {
-        this.customersList.openNewDetails(
+    async onNewCustomer_click() {
+        await this.customersList.openNewDetails(
             "./PEdCustomer", "Add New Customer", {
                 customersModel:this.custModel,
                 newRecord:true

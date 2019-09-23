@@ -361,66 +361,108 @@ class ZBootstrapTable extends ZController {
             await this.closeNewDetails();
         }
     }
-    async closeDetails(idx) {
+    closeDetails(idx) {
         if (idx == -1) {
-            await this.closeNewDetails()
-            return;
+            return this.closeNewDetails(); // Promise
         }
-        let controller = this.detailsPanels[idx];
-        await controller.processEvent(controller, "deactivated", []);
-        delete this.detailsPanels[idx];
-        let tr = this.find("tr[data-row='" + idx + "']");
-        let detailsRow = tr.nextSibling;
-        detailsRow.parentNode.removeChild(detailsRow);
-        let togglerIcon = tr.querySelector(".details-toggler");
-        togglerIcon.innerHTML = "  <i class='" + this.detailsTogglerOpenIcon + "'></i>";
+        return new Promise(async (resolve, reject) => {
+            let controller = this.detailsPanels[idx];
+            await controller.processEvent(controller, "deactivated", []);
+            let tr = this.find("tr[data-row='" + idx + "']");
+            let detailsRow = tr.nextSibling;
+            let detailsDiv = detailsRow.firstChild.firstChild;
+            let detailsHeight = detailsDiv.offsetHeight;
+            detailsDiv.style["margin-top"] = (-detailsHeight) + "px";
+            delete this.detailsPanels[idx];
+            setTimeout(_ => {
+                if (detailsRow.parentNode) {
+                    detailsRow.parentNode.removeChild(detailsRow);
+                }
+                let togglerIcon = tr.querySelector(".details-toggler");
+                togglerIcon.innerHTML = "  <i class='" + this.detailsTogglerOpenIcon + "'></i>";
+                resolve();
+            }, 300);
+        })        
     }
-    async openDetails(idx) {
-        let spec = await this.triggerEvent("getDetailsConfig", this.rows[idx], idx);
-        if (!spec) {
-            throw "No '{panelPath, options}' returned from 'getDetailsPanelConfig' event";
-        }
-        let {path, options} = spec;
-        let tr = this.find("tr[data-row='" + idx + "']");
-        let newRow = document.createElement("TR");
-        newRow.innerHTML = "<td colspan='" + (this.columns.length) + "' class='details-cell " + (this.detailsCellClass?this.detailsCellClass:"") + "' >Nueva Fila</td>";
-        tr.parentNode.insertBefore(newRow, tr.nextSibling);
-        let td = newRow.firstChild;
-        let controller = await ZVC.loadComponent(td, this, path);
-        await controller.init(options);
-        this.detailsPanels[idx] = controller;
-        await controller.activate();
-        let togglerIcon = tr.querySelector(".details-toggler");
-        togglerIcon.innerHTML = "  <i class='" + this.detailsTogglerCloseIcon + "'></i>";
+    openDetails(idx) {
+        return new Promise(async (resolve, reject) => {
+            let spec = await this.triggerEvent("getDetailsConfig", this.rows[idx], idx);
+            if (!spec) {
+                reject("No '{panelPath, options}' returned from 'getDetailsPanelConfig' event");
+                return;
+            }
+            let {path, options} = spec;
+            let tr = this.find("tr[data-row='" + idx + "']");
+            let newRow = document.createElement("TR");
+            newRow.innerHTML = "<td colspan='" + (this.columns.length) + "' class='details-cell " + (this.detailsCellClass?this.detailsCellClass:"") + "' style='overflow-y:hidden;'><div></div></td>";
+            tr.parentNode.insertBefore(newRow, tr.nextSibling);
+            let td = newRow.firstChild;
+            let detailsDiv = td.firstChild;
+            let controller = await ZVC.loadComponent(detailsDiv, this, path);
+            let detailsHeight = controller.view.offsetHeight;
+            detailsDiv.style["margin-top"] = (-detailsHeight) + "px";
+            await controller.init(options);
+            this.detailsPanels[idx] = controller;
+            await controller.activate();
+            requestAnimationFrame(_ => {
+                detailsDiv.style.transition = "margin-top 0.3s ease-in";
+                detailsDiv.style["margin-top"] = "0";
+                setTimeout(_ => {
+                    resolve(controller);
+                }, 300);
+            })
+            let togglerIcon = tr.querySelector(".details-toggler");
+            togglerIcon.innerHTML = "  <i class='" + this.detailsTogglerCloseIcon + "'></i>";
+        });
     }
-    async openNewDetails(path, rowHTML, panelOptions) {
-        if (this.newDetailsController) {
-            await this.closeNewDetails();
-        }
-        let tbody = this.find("TBODY");
-        let firstTr = tbody.firstChild;
-        let headerTr = document.createElement("TR");
-        headerTr.classList.add("new-details-header-row");
-        headerTr.innerHTML = "<td colspan='" + this.columns.length + "'>" + rowHTML  +"</td>";
-        let contentTr = document.createElement("TR");
-        contentTr.classList.add("new-details-content-row");
-        contentTr.innerHTML = "<td class='details-cell' colspan='" + this.columns.length + "'>" + rowHTML  +"</td>";
-        let contentTd = contentTr.firstChild;
-        if (this.detailsCellClass) contentTd.classList.add(this.detailsCellClass);
-        let controller = await ZVC.loadComponent(contentTd, this, path);
-        tbody.insertBefore(contentTr, firstTr);
-        tbody.insertBefore(headerTr, contentTr);
-        await controller.init(panelOptions);
-        await controller.activate();
-        this.newDetailsController = controller;
+    openNewDetails(path, rowHTML, panelOptions) {
+        return new Promise(async (resolve, reject) => {
+            if (this.newDetailsController) {
+                await this.closeNewDetails();
+            }
+            let tbody = this.find("TBODY");
+            let firstTr = tbody.firstChild;
+            let headerTr = document.createElement("TR");
+            headerTr.classList.add("new-details-header-row");
+            headerTr.innerHTML = "<td colspan='" + this.columns.length + "'>" + rowHTML  +"</td>";
+            let contentTr = document.createElement("TR");
+            contentTr.classList.add("new-details-content-row");
+            contentTr.innerHTML = "<td class='details-cell' colspan='" + this.columns.length + "' style='overflow-y:hidden;'><div></div></td>";
+            let contentTd = contentTr.firstChild;
+            if (this.detailsCellClass) contentTd.classList.add(this.detailsCellClass);
+            let detailsDiv = contentTd.firstChild;
+            tbody.insertBefore(contentTr, firstTr);
+            tbody.insertBefore(headerTr, contentTr);
+            let controller = await ZVC.loadComponent(detailsDiv, this, path);
+            let detailsHeight = controller.view.offsetHeight;
+            detailsDiv.style["margin-top"] = (-detailsHeight) + "px";            
+            await controller.init(panelOptions);
+            await controller.activate();
+            this.newDetailsController = controller;
+            requestAnimationFrame(_ => {
+                detailsDiv.style.transition = "margin-top 0.25s";
+                detailsDiv.style["margin-top"] = "0";
+                setTimeout(_ => {
+                    resolve(controller);
+                }, 300);
+            });
+        });        
     }
-    async closeNewDetails() {
-        let trNewDetailsHeader = this.find(".new-details-header-row");
-        let trNewDetailsContent = this.find(".new-details-content-row");
-        await this.newDetailsController.processEvent(this.newDetailsController, "deactivated", []);
-        this.newDetailsController = null;
-        trNewDetailsContent.parentNode.removeChild(trNewDetailsContent);
-        trNewDetailsHeader.parentNode.removeChild(trNewDetailsHeader);
+    closeNewDetails() {
+        return new Promise(async (resolve, reject) => {
+            await this.newDetailsController.processEvent(this.newDetailsController, "deactivated", []);
+            this.newDetailsController = null;        
+            let trNewDetailsHeader = this.find(".new-details-header-row");
+            let trNewDetailsContent = this.find(".new-details-content-row");
+            let detailsDiv = trNewDetailsContent.firstChild.firstChild;
+            let detailsHeight = detailsDiv.offsetHeight;
+            detailsDiv.style["margin-top"] = (-detailsHeight) + "px";
+            setTimeout(_ => {
+                trNewDetailsContent.parentNode.removeChild(trNewDetailsContent);
+                trNewDetailsHeader.parentNode.removeChild(trNewDetailsHeader);
+                resolve();
+            }, 300);
+        });
     }
     updateRow(idx, row) {
         this.rows[idx] = row;

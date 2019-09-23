@@ -125,6 +125,21 @@ class ZVC {
     }
     static async openDialogInPlatform() {throw "openDialogInPlatform not implemented for ZDialogs"}
     static async closeDialogInPlatform() {throw "closeDialogInPlatform not implemented for ZDialogs"}
+
+    // Utitilies
+    static createTemporaryAnimation(name, frames, autodeleteDelay) {
+        let styleElement = document.createElement("style");
+        document.head.appendChild(styleElement);
+        let styleSheet = styleElement.sheet;
+        if (CSS && CSS.supports && CSS.supports('animation: name')) {
+            styleSheet.insertRule("@keyframes " + name + "{" + frames + "}", 0);
+        } else {
+            let rule = name + "{" + frames + "}";
+            styleSheet.insertRule("@-webkit-keyframes " + rule, 0);
+            styleSheet.insertRule("@keyframes " + rule, 1);
+        }
+        setTimeout(_ => styleElement.parentNode.removeChild(styleElement), autodeleteDelay);
+    }
 }
 
 /** Base Classes */
