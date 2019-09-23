@@ -352,14 +352,18 @@ class ZBootstrapTable extends ZController {
             await this.openDetails(idx);
         }
     }
-    async closeAllDetails() {
-        let keys = Object.keys(this.detailsPanels);
-        for (let i=0; i<keys.length; i++) {
-            await this.closeDetails(keys[i]);
-        }
-        if (this.newDetailsController) {
-            await this.closeNewDetails();
-        }
+    closeAllDetails() {
+        return new Promise(resolve => {
+            let promises = [];
+            let keys = Object.keys(this.detailsPanels);
+            for (let i=0; i<keys.length; i++) {
+                promises.push(this.closeDetails(keys[i]));
+            }
+            if (this.newDetailsController) {
+                promises.push(this.closeNewDetails());
+            }
+            Promise.all(promises).then(_ => resolve());
+        });
     }
     closeDetails(idx) {
         if (idx == -1) {
