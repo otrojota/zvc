@@ -1,4 +1,4 @@
-class BSDialogsDemo1 extends ZDialog {
+class BSDialogsDemo1 extends ZCustomControllr {
     onOpenDialog_click() {
         this.showDialog("./WDialog1", {}, 
             name => this.output.text = "Hello " + name, 
