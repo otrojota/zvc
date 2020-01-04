@@ -204,10 +204,10 @@ class ZController {
         return this.view.classList.includes(className);
     }
     addClass(classNames) {
-        classNames.split(" ").forEach(n = this.view.classList.add(n));
+        classNames.split(" ").forEach(n => this.view.classList.add(n));
     }
     removeClass(classNames) {
-        classNames.split(" ").forEach(n = this.view.classList.remove(n));
+        classNames.split(" ").forEach(n => this.view.classList.remove(n));
     }
     toggleClass(className) {
         return this.view.classList.toggle(className);
