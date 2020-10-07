@@ -1,4 +1,4 @@
-# ZVC - 0.83
+# ZVC - 0.95
 
 <p><i>
 Work in progress. Collaborators needed, please see <a href="https://otrojota.github.io/zvc/" target="_blank">Documentation Page</a>, read the principles and contact us if you want to collaborate.
