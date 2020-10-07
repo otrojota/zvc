@@ -2,6 +2,7 @@ class ZBootstrapTable extends ZController {
     onThis_init() {
         this.selectedRowClass = this.getAttribute("data-z-selected-row-class");
         this.isSelectable = this.selectedRowClass?true:false;
+        this.hiddenColumns = {}; // index:true
         this.paginator = null;
         this.pagination = "none";
         this.nPages = 5;
@@ -76,10 +77,9 @@ class ZBootstrapTable extends ZController {
         }
         super.processEvent(control, eventName, args);
     }
-    async refresh() {
+    async refresh(rowSelector) {
         await this.closeAllDetails();     
         this.rows = [];
-        this.selectedRowIndex = -1;
         if (this.pagination == "none" || this.pagination == "local") {
             this.rows = await this.triggerEvent("getRows");
             if (!this.rows) {
@@ -91,7 +91,15 @@ class ZBootstrapTable extends ZController {
                 this.recalcPagination(); 
             }
             this.repaint();
+            if (rowSelector) {
+                let idx = this.rows.findIndex(r => rowSelector(r));
+                if (idx >= 0) this.selectRowIndex(idx);
+                else this.selectRowIndex(-1);
+            } else {
+                this.selectRowIndex(-1);
+            }
         } else {
+            this.selectedRowIndex = -1;
             this.totalRows = await this.triggerEvent("getRowsCount");
             if (this.totalRows === undefined || isNaN(this.totalRows)) {
                 this.totalRows = 0;
@@ -172,8 +180,12 @@ class ZBootstrapTable extends ZController {
     }
     getRowElement(row, rowIndex) {
         let e = document.createElement("TR");
-        if (this.rowClass) e.classList.add(this.rowClass);
-        if (row._rowClass) e.classList.add(row._rowClass);
+        if (this.rowClass) {
+            this.rowClass.split(" ").forEach(c => e.classList.add(c));
+        }
+        if (row._rowClass) {
+            row._rowClass.split(" ").forEach(c => e.classList.add(c));
+        }
         if (rowIndex == this.selectedRowIndex) e.classList.add(this.selectedRowClass);
         e.setAttribute("data-row", rowIndex);
         e.innerHTML = this.getRowContentHTML(row, rowIndex);
@@ -186,7 +198,7 @@ class ZBootstrapTable extends ZController {
             if (col.detailsToggler) {
                 let cellClass = this.detailsTogglerCellClass;
                 if (row.detailsToggler_cellClass) cellClass += " " + row.detailsToggler_cellClass;
-                html += "<td class='details-toggler " + cellClass + "' style='cursor:pointer;'>";
+                html += "<td class='details-toggler " + cellClass + "' style='cursor:pointer;" + (this.hiddenColumns[j]?"display:none;":"") + "'>";
                 if (this.detailsPanels[rowIndex]) {
                     html += "  <i class='" + this.detailsTogglerCloseIcon + "'></i>";
                 } else {
@@ -197,7 +209,7 @@ class ZBootstrapTable extends ZController {
                 let cellClass = this.cellClass;
                 if (col.cellClass) cellClass += " " + col.cellClass;
                 if (row[col.field + "_cellClass"]) cellClass += " " + row[col.field + "_cellClass"];
-                html += "<td class='" + cellClass + "'>";
+                html += "<td class='" + cellClass + "' style='" + (this.hiddenColumns[j]?"display:none;":"") + "'>";
                 if (col.clickable) html += "<a href='#' class='clickable-cell' data-row='" + rowIndex + "' data-field='" + col.field + "'>";
                 html += row[col.field];
                 if (col.clickable) html += "</a>";
@@ -330,6 +342,7 @@ class ZBootstrapTable extends ZController {
     }
 
     selectRowIndex(idx) {
+        let oldSelectedRowIndex = this.selectedRowIndex;
         if (this.selectedRowIndex >= 0) {
             let oldSelected = this.find("tr[data-row='" + this.selectedRowIndex + "']");
             if (oldSelected) oldSelected.classList.remove(this.selectedRowClass);
@@ -338,7 +351,9 @@ class ZBootstrapTable extends ZController {
         if (idx >= 0) {
             let newSelected = this.find("tr[data-row='" + this.selectedRowIndex + "']");
             if (newSelected) newSelected.classList.add(this.selectedRowClass);
-            this.triggerEvent("change", this.rows[this.selectedRowIndex], this.selectedRowClass);
+        }
+        if (oldSelectedRowIndex != this.selectedRowIndex) {
+            this.triggerEvent("change", this.rows[this.selectedRowIndex], this.selectedRowIndex);
         }
     }
     getSelectedRow() {
@@ -398,7 +413,7 @@ class ZBootstrapTable extends ZController {
             let {path, options} = spec;
             let tr = this.find("tr[data-row='" + idx + "']");
             let newRow = document.createElement("TR");
-            newRow.innerHTML = "<td colspan='" + (this.columns.length) + "' class='details-cell " + (this.detailsCellClass?this.detailsCellClass:"") + "' style='overflow-y:hidden;'><div></div></td>";
+            newRow.innerHTML = "<td colspan='" + (this.columns.length) + "' class='details-cell " + (this.detailsCellClass?this.detailsCellClass:"") + "' style='overflow:hidden;'><div></div></td>";
             tr.parentNode.insertBefore(newRow, tr.nextSibling);
             let td = newRow.firstChild;
             let detailsDiv = td.firstChild;
@@ -419,16 +434,13 @@ class ZBootstrapTable extends ZController {
             togglerIcon.innerHTML = "  <i class='" + this.detailsTogglerCloseIcon + "'></i>";
         });
     }
-    openNewDetails(path, rowHTML, panelOptions) {
+    openNewDetails(path, panelOptions) {
         return new Promise(async (resolve, reject) => {
             if (this.newDetailsController) {
                 await this.closeNewDetails();
             }
             let tbody = this.find("TBODY");
             let firstTr = tbody.firstChild;
-            let headerTr = document.createElement("TR");
-            headerTr.classList.add("new-details-header-row");
-            headerTr.innerHTML = "<td colspan='" + this.columns.length + "'>" + rowHTML  +"</td>";
             let contentTr = document.createElement("TR");
             contentTr.classList.add("new-details-content-row");
             contentTr.innerHTML = "<td class='details-cell' colspan='" + this.columns.length + "' style='overflow-y:hidden;'><div></div></td>";
@@ -436,7 +448,6 @@ class ZBootstrapTable extends ZController {
             if (this.detailsCellClass) contentTd.classList.add(this.detailsCellClass);
             let detailsDiv = contentTd.firstChild;
             tbody.insertBefore(contentTr, firstTr);
-            tbody.insertBefore(headerTr, contentTr);
             let controller = await ZVC.loadComponent(detailsDiv, this, path);
             let detailsHeight = controller.view.offsetHeight;
             detailsDiv.style["margin-top"] = (-detailsHeight) + "px";            
@@ -463,7 +474,6 @@ class ZBootstrapTable extends ZController {
             detailsDiv.style["margin-top"] = (-detailsHeight) + "px";
             setTimeout(_ => {
                 trNewDetailsContent.parentNode.removeChild(trNewDetailsContent);
-                trNewDetailsHeader.parentNode.removeChild(trNewDetailsHeader);
                 resolve();
             }, 300);
         });
@@ -507,6 +517,23 @@ class ZBootstrapTable extends ZController {
         if (selectionChanged) {
             await this.triggerEvent("change", null, -1);
         }
+    }
+
+    hideColumn(idx) {
+        this.hiddenColumns[idx] = true;
+        this.view.querySelectorAll("th")[idx].style.display = "none";
+        this.view.querySelectorAll("tr").forEach(tr => {
+            let tds = tr.querySelectorAll("td");
+            if (tds.length) tds[idx].style.display = "none";
+        })
+    }
+    showColumn(idx) {
+        delete this.hiddenColumns[idx];
+        delete this.view.querySelectorAll("th")[idx].style.removeProperty("display");
+        this.view.querySelectorAll("tr").forEach(tr => {
+            let tds = tr.querySelectorAll("td");
+            if (tds.length) delete tds[idx].style.removeProperty("display");
+        })
     }
 }
 ZVC.registerComponent("TABLE", _ => (true), ZBootstrapTable);

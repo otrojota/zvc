@@ -1,7 +1,7 @@
 ZVC.openDialogInPlatform = dialog => {
     let d = $(dialog.view.firstChild);
     d.modal({
-        show:false, keyboard:false, backdrop:"static"
+        show:false, keyboard:true, backdrop:"static"
     });
     d.on("hidden.bs.modal", () => {
         if (!dialog._closedFromController) {

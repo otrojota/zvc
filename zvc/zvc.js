@@ -24,11 +24,7 @@ class ZVC {
         if (!path) throw "Root element must have data-z-component='path-to-component'";
         if (path.startsWith("./")) {
             let docPath = document.location.pathname;
-            let p = docPath.lastIndexOf("/");
-            if (p >= 0) {
-                docPath = docPath.substr(0, p);
-            }
-            //if (docPath.endsWith("/")) docPath = docPath.substr(0,docPath.length - 1);
+            if (docPath.endsWith("/")) docPath = docPath.substr(0,docPath.length - 1);
             path = docPath + path.substr(1);
         }
         let newComponent = await ZVC.loadComponent(domElement, null, path);
@@ -94,6 +90,7 @@ class ZVC {
             let controllerClass = ZVC.lastExportedClass;
             if (!controllerClass) throw "No ZVC.export(ControllerClass) at the end of controller file";
             let zId = ZVC.nextZId();
+            if (ZVC.options.htmlPreprocessor) html = ZVC.options.htmlPreprocessor(html);
             domElement.innerHTML = ZVC.parseHTML(html, {zId:zId});
             let controller = new (controllerClass)(domElement, parentController, dir)
             controller.zId = zId;
@@ -201,13 +198,13 @@ class ZController {
         return this.view.style.display != "none";
     }
     hasClass(className) {
-        return this.view.classList.includes(className);
+        return this.view.classList.contains(className);
     }
     addClass(classNames) {
-        classNames.split(" ").forEach(n = this.view.classList.add(n));
+        classNames.split(" ").forEach(n => this.view.classList.add(n));
     }
     removeClass(classNames) {
-        classNames.split(" ").forEach(n = this.view.classList.remove(n));
+        classNames.split(" ").forEach(n => this.view.classList.remove(n));
     }
     toggleClass(className) {
         return this.view.classList.toggle(className);
@@ -221,6 +218,11 @@ class ZController {
     enable() {this.view.disabled = false}   
     disable() {this.view.disabled = true}
     isEnabled() {return this.view.disableb?false:true}
+    //get pos() {let r = this.view.getBoundingClientRect(); return {left:r.left, top:r.top}}
+    get pos() {return {left:parseFloat(this.view.style.left), top:parseFloat(this.view.style.top)}}
+    set pos(p) {this.view.style.left = p.left + "px"; this.view.style.top = p.top + "px"}
+    get size() {return {width:this.view.clientWidth, height:this.view.clientHeight}}
+    set size(s) {this.view.style.width = s.width + "px"; this.view.style.height = s.height + "px"}
 
     async showDialog(path, options, okCallback, cancelCallback) {
         let cnt = document.getElementById("dialogs-container");
@@ -426,7 +428,7 @@ class ZDynamicSelect extends ZSelect {
         this.rows = rows;
         this.view.innerHTML = this.rows.reduce((html, row, idx) => {
             let id = row[this.idField];
-            let label = row[this.labelField];
+            let label = window.toLang?window.toLang(row[this.labelField]):row[this.labelField];
             html += "<option value='" + idx + "'" + (selectedId == id?" selected":"") + ">" + label + "</option>";
             return html;
         }, (this.placeHolder?("<option disabled selected>" + this.placeHolder + "</option>"):""));
