@@ -434,13 +434,16 @@ class ZBootstrapTable extends ZController {
             togglerIcon.innerHTML = "  <i class='" + this.detailsTogglerCloseIcon + "'></i>";
         });
     }
-    openNewDetails(path, panelOptions) {
+    openNewDetails(path, rowHTML, panelOptions) {
         return new Promise(async (resolve, reject) => {
             if (this.newDetailsController) {
                 await this.closeNewDetails();
             }
             let tbody = this.find("TBODY");
             let firstTr = tbody.firstChild;
+            let headerTr = document.createElement("TR");
+            headerTr.classList.add("new-details-header-row");
+            headerTr.innerHTML = "<td colspan='" + this.columns.length + "'>" + rowHTML  +"</td>";
             let contentTr = document.createElement("TR");
             contentTr.classList.add("new-details-content-row");
             contentTr.innerHTML = "<td class='details-cell' colspan='" + this.columns.length + "' style='overflow-y:hidden;'><div></div></td>";
@@ -448,6 +451,7 @@ class ZBootstrapTable extends ZController {
             if (this.detailsCellClass) contentTd.classList.add(this.detailsCellClass);
             let detailsDiv = contentTd.firstChild;
             tbody.insertBefore(contentTr, firstTr);
+            tbody.insertBefore(headerTr, contentTr);
             let controller = await ZVC.loadComponent(detailsDiv, this, path);
             let detailsHeight = controller.view.offsetHeight;
             detailsDiv.style["margin-top"] = (-detailsHeight) + "px";            
@@ -474,6 +478,7 @@ class ZBootstrapTable extends ZController {
             detailsDiv.style["margin-top"] = (-detailsHeight) + "px";
             setTimeout(_ => {
                 trNewDetailsContent.parentNode.removeChild(trNewDetailsContent);
+                trNewDetailsHeader.parentNode.removeChild(trNewDetailsHeader);
                 resolve();
             }, 300);
         });

@@ -1,0 +1,19 @@
+<h4>ZRepeater</h4>
+<p>
+    Repeater elements can be DIV, UL, OL. For each row received, an instance of a referenced controller (and its view) is created.
+    Row object is passed to each child instance as the argument in it's "init" event.
+</p>
+<p>
+    Use "data-z-repeat" attribute to reference target element. 
+    Each instance of target element will be contained inside a DIV element. Attribute "data-z-container-tag" can be used to change container element type.
+    "data-z-container-classes" attribute can be used to define CSS classes for each container instance.
+</p>
+<p>
+    Created controllers for each row have an attribute called "repeaterIndex". Child controller instances can be accesed using "controllers" array field in repeater control.
+</p>
+
+<div id="demo" data-z-component="./RepeaterDemo1"></div>
+<div id="demo2" data-z-component="./RepeaterDemo1Element" style="display: none;"></div>
+<hr />
+<div id="codeBrowser" data-z-component="./../../common/CodeBrowser"></div>
+<div id="code2Browser" data-z-component="./../../common/CodeBrowser"></div>
