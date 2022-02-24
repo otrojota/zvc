@@ -23,16 +23,20 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.17.1/components/prism-core.js"></script>        
         <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.17.1/plugins/autoloader/prism-autoloader.min.js"></script>
 
-        <script src="zvc/zvc.js?v=0.83" type="text/javascript"></script>
+        <script src="zvc/zvc.js?v=0.95" type="text/javascript"></script>
         <script src="zvc/zvc-bootstrap-dialogs.js"></script>
-        <script src="zvc/zvc-bootstrap-table.js?v=0.95"></script>
+        <script src="zvc/zvc-bootstrap-table.js?v=0.96"></script>
+        <script src="zvc/zvc-bootstrap-repeater.js?v=0.10"></script>
 
         <script src="bs/content/table/CustomersModel.js?v=0.2"></script>
+        <script src="bs/content/repeater/CustomersModel2.js?v=0.5"></script>
 
         <script>
             document.addEventListener("DOMContentLoaded", async _ => {                
                 ZVC.options.debug.events = false;
-                let root = await ZVC.fromElement("main");
+                ZVC.options.debug.loading = false;
+                ZVC.options.cache = false;
+                let rootController = await ZVC.fromElement("main");
             });
         </script>
     </head>

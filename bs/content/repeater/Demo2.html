@@ -1,0 +1,24 @@
+<div class="container">
+    <div class="border rounded shadow p-2">
+        <nav class="navbar navbar-light bg-light rounded">
+            <a class="navbar-brand">Customers List</a>
+            <div id="textSearch" data-z-component="./../../../common/TextSearch" style="max-width: 160px;"></div>
+        </nav>
+        <div id="repeater" class="mt-2 w-100" style="text-align: center;"
+            data-z-repeat="./CustomerCard"
+            data-z-container-classes="card m-2 shadow"
+            data-z-container-style="width: 300px; display: inline-block;"
+            data-z-pagination="#paginator"
+            data-z-rows-info="#rowsDetail"
+        ></div>
+        <div class="border-top pt-2 pb-1">
+            <div id="rowsDetail" class="text-center text-muted"></div>
+            <div id="paginator" class="pagination pagination-sm float-right" style="margin-top:-26px;"
+                data-z-pagination="server"
+                data-z-n-rows-per-page="10"
+                data-z-n-pages="5"
+            >
+            </div>
+        </div>
+    </div>
+</div>

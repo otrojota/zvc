@@ -1,0 +1,23 @@
+<h4>ZVC - Bootstrap Paginated Repeater</h4>
+<p>
+    ZVC Bootstrap Paginated Repeater extends ZRepeater component adding pagination behaviour.
+    In order to use this component, please include <br />
+    <code>&lt;script src="zvc/zvc-bootstrap-repeater.js"&gt;&lt;/script&gt;</code> after zvc.js
+</p>
+<p>
+    Examples in next sections show how pagination works.
+    Examples use a simulated Customers Model to interact with data. This model supports search and basic CRUD operations.
+    A text search field is also used in examples.
+</p>
+<p>
+    Customers are rendered in page using CustomerCard component. One instance of this component is created for every row in the page. 
+    Field "repeaterIndex" starts with 0 for each returned page. Field "controllers" in repeater components hols and array of controller instances created for current page.
+</p>
+<div id="codeBrowser" data-z-component="./../../../common/CodeBrowser"></div>
+<hr />
+<p>
+    To make examples more real a reusable TextSearch component is used to filter rows:<br />
+    <div id="textSearch" data-z-component="./../../../common/TextSearch"></div>
+    <hr />
+    <div id="codeBrowser2" data-z-component="./../../../common/CodeBrowser"></div>
+</p>

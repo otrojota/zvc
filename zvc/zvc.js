@@ -2,7 +2,7 @@
 class ZVC {
     static get _defaultOptions() {
         return {
-            debug:{events: false},
+            debug:{events: false, loading:false},
             cache: false
         }
     }
@@ -73,14 +73,17 @@ class ZVC {
             return controller;
         }
 
-        if (ZVC.options.cache && ZVC.cache && ZVC.cache[dir]) {
-            let cache = ZVC.cache[dir];
+        if (ZVC.options.cache && ZVC.cache && ZVC.cache[dir + "/" + componentName]) {
+            if (ZVC.options.debug.loading) console.debug("Reusing cached component from " + dir + "/" + componentName);
+            let cache = ZVC.cache[dir + "/" + componentName];
             return await this.loadComponent(domElement, parentController, path, cache.controllerClass, cache.html);
         }
 
         let headers = new Headers();
         headers.append('pragma', 'no-cache');
         headers.append('cache-control', 'no-cache');
+
+        if (ZVC.options.debug.loading) console.debug("Loading component from " + dir + "/" + componentName);
 
         let pHtml = fetch(dir + "/" + componentName + ".html", {headers:headers});
         let pJs = fetch(dir + "/" + componentName + ".js", {headers:headers});
@@ -116,7 +119,7 @@ class ZVC {
             controller.zId = zId;
             if (ZVC.options.cache) {
                 if (!ZVC.cache) ZVC.cache = {};
-                ZVC.cache[dir] = {html:ZVC.lastHTML, controllerClass:ZVC.lastControllerClass};
+                ZVC.cache[dir + "/" + componentName] = {html:ZVC.lastHTML, controllerClass:ZVC.lastControllerClass};
             }
             return controller;
         } catch(error) {
@@ -173,9 +176,11 @@ class ZController {
         if (!domElement) throw "Cannot find domElement";
         this.parentController = parentController;
         this.path = basePath;
+        this.alias = this.view.getAttribute("data-z-alias");
     }
     get view() {return this.domElement}
     get id() {return this.view.id}
+    get codeName() {return this.alias || this.id}
     
     zDescribe() {return this.constructor.name + "[" + this.id + "]"}
 
@@ -188,7 +193,7 @@ class ZController {
         return await this.parentController.processEvent(this, eventName, args);
     }
     async processEvent(control, eventName, args) {
-        let srcId = control == this?"this":control.id;
+        let srcId = control == this?"this":control.codeName;
         let funcName = "on" + srcId.substr(0,1).toUpperCase() + srcId.substr(1) + "_" + eventName;
         let func = this[funcName];
         if (func && typeof func == "function") {
@@ -324,7 +329,7 @@ class ZCompoundController extends ZController {
                 }
                 if (childController) {
                     this.controllers.push(childController);
-                    this[c.id] = childController;
+                    this[childController.codeName] = childController;
                     await childController.init();
                 }
                 if (parseChildren) {
@@ -501,6 +506,8 @@ class ZRepeater extends ZCompoundController {
         this.elementPath = this.view.getAttribute("data-z-repeat");
         this.containerTag = this.view.getAttribute("data-z-container-tag") || "DIV";
         this.containerClasses = this.view.getAttribute("data-z-container-classes");
+        this.containerStyle = this.view.getAttribute("data-z-container-style");
+        console.log("style", this.containerStyle);
         await super.init(options);
     }
 
@@ -525,6 +532,9 @@ class ZRepeater extends ZCompoundController {
             let container = document.createElement(this.containerTag);
             if (this.containerClasses) {
                 container.className = this.containerClasses;
+            }
+            if (this.containerStyle) {
+                container.style = this.containerStyle;
             }
             let controller = await ZVC.loadComponent(container, this, this.elementPath, controllerClass, html);
             controller.repeaterIndex = this.controllers.length;
